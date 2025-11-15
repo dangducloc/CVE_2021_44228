@@ -1,0 +1,40 @@
+version: '3.8'
+
+services:
+  mysql:
+    build: ./Data
+    container_name: vulnapp_mysql
+    environment:
+      MYSQL_DATABASE: pentest_final
+      MYSQL_USER: linh
+      MYSQL_PASSWORD: linh
+      MYSQL_ROOT_PASSWORD: "linh"
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - vulnapp_network
+
+  app:
+    build: .
+    container_name: vulnapp_app
+    ports:
+      - "8080:8080"
+    depends_on:
+      - mysql
+    environment:
+      - DB_URL=jdbc:mysql://mysql:3306/pentest_final
+      - DB_USER=root
+      - DB_PASSWORD=linh
+    # volumes:
+    #   - ./src/main/webapp/imgs:/usr/local/tomcat/webapps/ROOT/imgs
+
+    networks:
+      - vulnapp_network
+
+volumes:
+  mysql_data:
+
+networks:
+  vulnapp_network:
