@@ -3,7 +3,7 @@ version: '3.8'
 services:
   mysql:
     build: ./Data
-    container_name: vulnapp_mysql
+    container_name: mysql
     environment:
       MYSQL_DATABASE: pentest_final
       MYSQL_USER: linh
@@ -12,24 +12,33 @@ services:
     ports:
       - "3306:3306"
     volumes:
-      - mysql_data:/var/lib/mysql
+      - ./mysql_data:/var/lib/mysql
     networks:
       - vulnapp_network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-plinh"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
 
   app:
-    build: .
-    container_name: vulnapp_app
+    image: melp007/vulnapp:latest
+    build: 
+      context: .
+      dockerfile: "dockerfile.v3"
+      # dockerfile: "dockerfile.v2"
+      # dockerfile: "dockerfile.v1"
+    container_name: vulnapp
     ports:
-      - "8080:8080"
+      - "80:8080"
     depends_on:
-      - mysql
+      mysql:
+        condition: service_healthy
     environment:
       - DB_URL=jdbc:mysql://mysql:3306/pentest_final
       - DB_USER=root
       - DB_PASSWORD=linh
-    # volumes:
-    #   - ./src/main/webapp/imgs:/usr/local/tomcat/webapps/ROOT/imgs
-
     networks:
       - vulnapp_network
 

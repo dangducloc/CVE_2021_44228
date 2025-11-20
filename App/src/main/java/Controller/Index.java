@@ -46,6 +46,8 @@ public class Index extends HttpServlet {
 
         // Log
         for (Img img : images) {
+            
+            System.out.println("===========================fetched image==================================");
             logger.info("Image ID: {}, Name by User: {}, Name on Server: {}",
                     img.getId(), img.getName_by_user(), img.getName_on_server());
         }
